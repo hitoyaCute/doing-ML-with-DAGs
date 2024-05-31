@@ -201,68 +201,78 @@ def pop_range(lst, start, end):
 
 
 
-random.seed(2)
-print(agent_sort_by_score([[0, random.randint(-10,10)] for _ in range(5)]))
-random.seed(2)
-a = [[0, random.randint(-10,10)] for _ in range(5)]
-a = sorted(a,key= lambda x: x[1], reverse=True)
-print(a)
+#random.seed(2)
+#print(agent_sort_by_score([[0, random.randint(-10,10)] for _ in range(5)]))
+#random.seed(2)
+#a = [[0, random.randint(-10,10)] for _ in range(5)]
+#a = sorted(a,key= lambda x: x[1], reverse=True)
+#print(a)
 
-from timeit import timeit
+def main():
+	from timeit import timeit
+	
+	num = 1_000
+	
+	#print(timeit("agent_sort_by_score(a)", number=num, globals=globals()))
+	#print(timeit("sorted(a,key= lambda x: x[1], reverse=True)", number=num, globals=globals()))
+	#print(timeit("a.sort(key= lambda x: x[1], reverse=True);s = a", number=num, globals=globals()))
+	
+	
+	flat2D = lambda x: [a for q in x for a in q]
+	###################
+	
+	
+	x = "x"
+	o = "o"
+	n = ""
+	
+	#input
+	i = [[x,n,x],
+	     [o,o,x],
+	     [n,n,n]]
+	     
+	s = [[-1.0 if x == a else 1.0 if o == a else 0.001 for a in q] for q in i]
+	
+	s = flat2D(s)
+	
+	seed = 1
+	
+	inputs = 9
+	outputs = 2
+	
+	HLayer = [8,9,5]
+	
+	dag = network(inputs,outputs)
+	
+	print("input:",i,"translated:",s,sep="\n")
+	
+	total = sum(HLayer)+inputs+outputs
+	#do nothing yet
+	for nodeLen in HLayer:
+		for i in range(nodeLen):
+			pass
+	
+	#create the interconnection
+	#make a random weight for each connection 
+	random.seed(seed)
+	for i in range(inputs):
+		for j in range(outputs):
+			dag.add_connection(i,j,random.randint(-5,5))
+	
+	
+	#random bias for all node
+	random.seed(seed)
+	for i in dag.topoSort():
+		dag.change_bias(i,random.randint(-5,5))
+	
+	
+	print("output\n  ",dag.ev(s))
+	#print("nodes",dag.nodes)
+	print(f"total nodes {len(dag.nodes)}")
+	
+	random.seed(seed)
+	print(random.randint(0,5))
 
-num = 1_000
 
-#print(timeit("agent_sort_by_score(a)", number=num, globals=globals()))
-#print(timeit("sorted(a,key= lambda x: x[1], reverse=True)", number=num, globals=globals()))
-#print(timeit("a.sort(key= lambda x: x[1], reverse=True);s = a", number=num, globals=globals()))
-
-
-flat2D = lambda x: [a for q in x for a in q]
-###################
-
-
-x = "x"
-o = "o"
-n = ""
-
-i = [[x,n,x],
-     [o,o,x],
-     [n,n,n]]
-     
-s = [[-1.0 if x == a else 1.0 if o == a else 0.001 for a in q] for q in i]
-
-s = flat2D(s)
-
-seed = 99999
-
-inputs = 9
-outputs = 2
-
-HLayer = [8,9,5]
-
-dag = network(inputs,outputs)
-
-print("input:",i,"translated:",s,sep="\n")
-
-total = sum(HLayer)+inputs+outputs
-for nodeLen in HLayer:
-	for i in range(nodeLen):
-		pass
-
-random.seed(seed)
-for i in range(inputs):
-	for j in range(outputs):
-		dag.add_connection(i,j,random.randint(-5,5))
-
-
-random.seed(seed)
-for i in dag.topoSort():
-	dag.change_bias(i,random.randint(-5,5))
-
-
-print("output\n  ",dag.ev(s))
-#print("nodes",dag.nodes)
-print(f"total nodes {len(dag.nodes)}")
-
-random.seed(seed)
-print(random.randint(0,5))
+if __name__ = "__main__":
+	main()
