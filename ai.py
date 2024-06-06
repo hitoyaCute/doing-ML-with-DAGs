@@ -276,3 +276,73 @@ def main():
 
 if __name__ = "__main__":
 	main()
+
+import random
+
+#========tic tac toe training code============
+is_board_full = lambda board: (all(cell != '' for cell in board.copy()))
+available_move = lambda board: [i for i,c in enumerate(board) if c == '']
+
+win_combo = [
+	[0,1,2],[3,4,5],[6,7,8],
+	[0,3,6],[1,4,7],[2,5,8],
+	[0,4,8],[2,4,6]
+]
+
+def is_winner(player,board):
+	for c in win_combo:
+		if all(board[i]==player for i in c.copy()):
+			return True
+	return False
+	
+def play(board):
+	
+	a = input().split(",")
+	a = [int(i) for i in a]
+#	a=((y+1)*3)+(x+1)
+#	print(a)
+	return a
+
+def dplay(agent):
+	y,x = [i+1 for i in agent]
+	return (y*3)+x
+
+def fit(network, is_agent_attack_x=True, fitness_seed:int=0) -> int:
+	random.seed(fitness_seed)
+	board = [""]*9
+	cboard = [0]*9
+	
+	score = 0
+	while not is_board_full(board):
+		
+		score -= 1
+		x_move = dplay(network.run(cboard)) if is_agent_attack_x else random.choice(available_move(board))
+		
+		a = (1,-1) if is_agent_attack_x else (-1,1)
+		
+		if board[x_move] == "":
+			board[x_move] = "x"
+			cboard[x_move] = a[0]
+			if is_winner("x",board):
+				print("x won")
+				score -= 20
+				break
+			if is_board_full(board):
+				print("tie")
+				break
+			o_move = random.choice(available_move(board)) if is_agent_attack_x else dplay(network.run(cboard))
+			print(o_move)
+			board[o_move] = "o"
+			cboard[o_move] = a[1]
+			if is_winner("o",board):
+				print("o won")
+				score += 100
+				break
+		else:
+			print("oof wrong attack ",x_move,board[x_move])
+			return score + 999
+		for i in range(0,9,3):
+			print(board[i:i+3])
+	
+	return score
+#========tic tac toe training code============
