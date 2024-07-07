@@ -14,16 +14,44 @@ def main():
     print(net.nodes,"biases")
     print(net.order_nodes())
     print(net.forward([1.5,2.4]))
-
+#play against the ai
+def main():
+    import tictactoe as rps
+    from tictactoe import play
+    agent = load("net.tt")
+    
+    def w(f):
+        def inner(v):
+            s = f(v)
+            print(v,s)
+            return s
+        return inner
+    rps.b = w(rps.b)
+    
+    
+    def interpret(var):
+        def _inv(environment:list):
+            a,b = [int(i) for i in agent.forward([0 if i=='' else 1 if i==var else -1 for i in environment.copy()])]
+            return ((a+1)*3)+b+1
+        return _inv
+    
+    a = play(interpret("o"), rps.a)[0]
+    print(a)
+    
 
 
 def load(file_dir:str):
-    with open(file_dir) as data:
-        data = data.splitlines()
-        inp,outp = [int(val) for val in data[0].split(",")]
+    with open(file_dir, "rt") as data:
+        
+        
+        dat = data.readline().strip().split(" ")
+        inp,outp = [int(v) for v in dat[:2]]
         net = Network(inp,outp)
-        for step in data[1:]:
-            act, trgt, rs = step.split(";")
+        for step in data:
+            
+            act, trgt, rs = step.strip().split(";")
+            r1,r2,r3 = map(int,rs.split(" "))
+            b_target,sn_target,dn_target = map(int,trgt.strip().split(' '))
             if act == "node":
                 net.add_node(sn_target,dn_target,r1,r2,r3)
             elif act == "bias":
