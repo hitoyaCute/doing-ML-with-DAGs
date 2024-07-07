@@ -26,16 +26,16 @@ def ask():
         if a == "l":
             training = True
             pause = False
+    a = [[0,1],[0,2],[2,3]];f = lambda x:x[0]
 
 
-
-def train(generation=500000000000000,seed=2):
-    random.seed(99)
-    num_of_agent = 200
+def train(generation=5000,seed=0):
+    random.seed(seed)
+    num_of_agent = 100
     
     def evolve_agents(participants):
         print("evolving...")
-        return [net.mutate(20,7) for net in participants]
+        return [net.mutate(50,25) for net in participants]
 
     
     #first initialize 1,000 agents
@@ -48,6 +48,7 @@ def train(generation=500000000000000,seed=2):
     #loop
     s = lambda x : x[1]
     i = 0
+    best = 0
     while True :
         if i == generation-1:
             break
@@ -61,18 +62,27 @@ def train(generation=500000000000000,seed=2):
         
         
         #step1 evaluate
-        with Threader(200) as exct:
+        with Threader(num_of_agent) as exct:
             evaluaties = list(exct.map(fit, agents))
             
             
         #step2 selection
+        
+        #random.shuffle(evaluaties)
+        
         evaluaties.sort(key=s)
-        print(f" max score : {evaluaties[0][1]} min score : {evaluaties[num_of_agent-1][1]}")
-        print(f" state:{agents[0].order_nodes(),agents[0].connections}")
-        agents[0].save("net.tt")#i can't think of creative format or name ._.
+        print(f" max score : {evaluaties[0][1]} min score : {evaluaties[num_of_agent-1][1]},best scr{best} ,total_agent {len(agents)}")
+        print(f" state:{evaluaties[0][0].order_nodes(),evaluaties[0][0].connections}")
+        
+        scr = evaluaties[0][1]
+        if best > scr:
+            best = scr
+            evaluaties[0][0].save("net.tt")#i can't think of creative format or name ._.
+        
+        
         evaluaties = [i[0] for i in evaluaties]
         
-        passers =  poprange(evaluaties,60)
+        passers =  poprange(evaluaties,0,30)
         
         
         #step3 mutaion
@@ -88,7 +98,7 @@ def fit(agent):
     def interpret(var):
         def _inv(environment:list):
             a,b = [int(i) for i in agent.forward([0 if i=='' else 1 if i==var else -1 for i in environment.copy()])]
-            return (a+1*3)+b+1
+            return ((a+1)*3)+b+1#i found this was the problem lol 😂
         return _inv
     
     a = play(interpret("o"), tictactoe.b)[0]
@@ -109,3 +119,4 @@ def poprange(lst, start, end=None):
     return result
 if __name__ == "__main__":
     main()
+    #main2()
