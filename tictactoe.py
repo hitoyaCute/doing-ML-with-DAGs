@@ -63,7 +63,7 @@ def _(network, is_agent_attack_x=True, fitness_seed:int=0) -> int:
 #========tic tac toe training code============
 
 def play(player_x:callable, player_o:callable):
-    random.seed(0)
+    #random.seed(0)
     board = [""]*9
     score_o = score_x = 0
     
@@ -74,11 +74,11 @@ def play(player_x:callable, player_o:callable):
         
         if board[x_move] == "":
             
-            score_x -= 1
+            score_x -= 2
             board[x_move] = "x"
             if is_winner("x",board):
                 
-                score_x -= 10
+                score_x -= 1
                 break
             if is_board_full(board):
                 
@@ -92,10 +92,11 @@ def play(player_x:callable, player_o:callable):
                 score_o += 99
                 break
             board[o_move] = "o"
-            score_o -= 1
+            score_o -= 2
             if is_winner("o",board):
                 
-                score_o -= 10
+                
+                score_o -= 1
                 break
         else:
             score_x += 99
@@ -122,7 +123,7 @@ def b(board):
 
     return random.choice(available_move(board))
     
-if __name__ == "__mai n__":
+if __name__ == "__main__":
     
     o, x = play(a, b)
     if o < x:
