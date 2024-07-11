@@ -20,6 +20,7 @@ def main():
     from tictactoe import play
     agent = load("net.tt")
     
+    
     def w(f):
         def inner(v):
             s = f(v)
@@ -31,11 +32,11 @@ def main():
     
     def interpret(var):
         def _inv(environment:list):
-            a,b = [int(i) for i in agent.forward([0 if i=='' else 1 if i==var else -1 for i in environment.copy()])]
+            a,b = [max((min((int(i),1)),-1)) for i in agent.forward([0 if i=='' else 1 if i==var else -1 for i in environment.copy()])]
             return ((a+1)*3)+b+1
         return _inv
     
-    a = play(interpret("o"), rps.a)[0]
+    a = play(interpret("x"), rps.a)
     print(a)
     
 
@@ -47,14 +48,17 @@ def load(file_dir:str):
         dat = data.readline().strip().split(" ")
         inp,outp = [int(v) for v in dat[:2]]
         net = Network(inp,outp)
+        #[(net.nodes.append(0), net.connections.append({})) for _ in range(5)]
+    
         for step in data:
             
             act, trgt, rs = step.strip().split(";")
-            r1,r2,r3 = map(int,rs.split(" "))
+            r1,r2,r3 = map(float,rs.split(" "))
             b_target,sn_target,dn_target = map(int,trgt.strip().split(' '))
             if act == "node":
                 net.add_node(sn_target,dn_target,r1,r2,r3)
             elif act == "bias":
+                
                 net.change_bias(b_target,r1)
             else :
                 net.add_connection(sn_target,dn_target,r1)
@@ -143,7 +147,10 @@ class Network:
     def add_connection(self, node, dest, w = 1.0):
         
         if node < len(self.connections):
-            self.connections[node][dest] = w
+            if dest in self.connections[node]:
+                self.connections[node][dest] = w
+            else:
+                self.connections[node][dest] = w
         else:
             self.connections.append({dest: w})
     def change_bias(self,srcs,bias):
